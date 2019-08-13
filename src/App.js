@@ -5,13 +5,13 @@ import Home from "./components/Home/Home";
 import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
 import "./css/bootstrap.css";
 import "antd/dist/antd.css";
-import "./App.css";
+// import "./App.css";
 
 function App() {
   return (
     <Router>
       <Switch>
-        <Route exact={true} path="/Home" render={() => <Home />} />
+        <Route path="/Home" render={() => <Home />} />
         <Route exact={true} path="/Login" render={() => <Login />} />
         <Route exact={true} path="/Register" render={() => <Register />} />
       </Switch>

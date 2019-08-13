@@ -12,7 +12,8 @@ class Login extends Component {
         redirect: false,
         error: false,
         errorMsg: "",
-        isResponseOK: false
+        isResponseOK: false,
+        user: null
     }
 
     handleInputChange = (event) => {
@@ -63,6 +64,7 @@ class Login extends Component {
                             this.setState({
                                 redirect: true
                             })
+                            localStorage.setItem("user", JSON.stringify(data));
                         }
                         if (this.state.error) {
                             this.setState({
@@ -77,7 +79,7 @@ class Login extends Component {
     render() {
         const { getFieldDecorator } = this.props.form;
         if (this.state.redirect) {
-            return <Redirect to="/Home"></Redirect>
+            return <Redirect to="/Home/feed"></Redirect>
         }
         return (
             <Container>
