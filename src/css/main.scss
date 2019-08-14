@@ -1,0 +1,64 @@
+.avatar-profile {
+  border: 3px solid #c2d7ea;
+  z-index: 1;
+  width: 100px;
+  height: 100px;
+  position: absolute;
+  border-radius: 50%;
+  top: 0;
+  transition: 0.5s;
+}
+
+.avatar-profile:hover {
+  background-color: rgba(128, 128, 128, 0.5);
+  transition: 0.5s;
+}
+
+.avatar-icon {
+  z-index: 2;
+}
+.avatar-icon:hover {
+  font-size: 30px;
+}
+
+.home-feed,
+.home-feed-avatar {
+  display: inline-block;
+}
+
+.home-feed {
+  position: absolute;
+  right: 0;
+  width: 88%;
+}
+
+.home-feed-avatar {
+  float: left;
+  margin-bottom: 5px;
+}
+
+textarea {
+  resize: none;
+}
+
+.content {
+  margin: 24px 20% 0;
+  // width: 50%;
+}
+
+.home-post {
+  position: relative;
+  // height: 159px;
+}
+
+.home-post-button {
+  position: absolute;
+  right: 0;
+  button {
+    margin-top: -32px;
+  }
+}
+
+.ant-comment-content-author-time {
+  margin-top: 1px;
+}

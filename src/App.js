@@ -5,7 +5,7 @@ import Home from "./components/Home/Home";
 import { BrowserRouter as Router, Link, Route, Switch } from "react-router-dom";
 import "./css/bootstrap.css";
 import "antd/dist/antd.css";
-// import "./App.css";
+import "./css/main.css";
 
 function App() {
   return (
