@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Layout, Avatar, Divider, Button, Modal, Icon, Upload, message } from 'antd';
+import { Layout, Avatar, Divider, Button, Modal, Icon, Upload, message, Row, Col } from 'antd';
 import Post from "../Posts/Post"
 import { beforeUpload, getBase64 } from "../../actions/imageUpload"
 import AvatarEditor from "react-avatar-editor"
@@ -13,24 +13,99 @@ class ProfileContent extends Component {
     state = {
         posts: [],
         modalVisible: false,
-        loading: false
+        user: null,
+        isResponseOk: false,
+        loading: true,
+        error: false,
+        followers: 0,
+        following: 0
     }
 
-    // componentDidMount() {
-    //     let bearer_token = sessionStorage.getItem("token");
-    // fetch("/api/Post/getMyPosts", {
-    //     method: "get",
-    //     headers: {
-    //         Accept: "application/json",
-    //         "Content-Type": "application/json",
-    //         Authorization: "Bearer " + bearer_token
-    //     }
-    // }).then(response => response.json()).then(data => {
-    //     this.setState({
-    //         posts: data
-    //     })
-    // })
-    // }
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.propsUpdate !== this.props.propsUpdate) {
+            this.loadUser()
+        }
+    }
+
+    componentDidMount() {
+        this.loadUser();
+    }
+
+    getFollowers = () => {
+        let username = window.location.pathname.split("/");
+        let bearer_token = sessionStorage.getItem("token");
+        fetch(`/api/Following/getNumberOfFollowers?username=${username[3]}`, {
+            method: "get",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + bearer_token
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    followers: data
+                })
+            })
+
+        fetch(`/api/Following/getNumberOfFollowing?username=${username[3]}`, {
+            method: "get",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + bearer_token
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                this.setState({
+                    following: data
+                })
+            })
+    }
+
+    loadUser = () => {
+        let username = window.location.pathname.split("/");
+        let bearer_token = sessionStorage.getItem("token");
+        fetch(`/api/User/getUserByUsername?username=${username[3]}`, {
+            method: "get",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + bearer_token
+            }
+        })
+            .then(response => {
+                if (response.ok) {
+                    this.setState({
+                        isResponseOk: true
+                    })
+                }
+                else {
+                    this.setState({
+                        isResponseOk: false
+                    })
+                }
+                return response.json()
+            })
+            .then(data => {
+                if (this.state.isResponseOk) {
+                    this.props.getMyPosts(username[3])
+                    this.getFollowers();
+                    this.setState({
+                        user: data,
+                        loading: false
+                    })
+                }
+                else {
+                    this.setState({
+                        loading: false,
+                        error: true
+                    })
+                }
+            })
+    }
 
     showModal = () => {
         this.setState({
@@ -100,7 +175,7 @@ class ProfileContent extends Component {
     setEditorRef = (editor) => this.editor = editor
 
     render() {
-        const user = this.props.user;
+        const user = this.state.user;
         const posts = this.props.posts;
         const onPhone = this.props.onPhone;
 
@@ -120,14 +195,29 @@ class ProfileContent extends Component {
                                     color: "#9c9a9a"
                                 }}
                                 >{"@" + user.username}</p>
-                                <Button shape="round" icon="edit" type="primary" onClick={this.showModal}>Edit</Button>
+                                <div className="followers text-center">
+                                    <div className="followers-text">
+                                        <b>Followers</b>
+                                        <br />
+                                        <b>{this.state.followers}</b>
+                                    </div>
+                                </div>
+
+
+                                <div className="following">
+                                    <div className="following-text">
+                                        <b>Following</b>
+                                        <br />
+                                        <b>{this.state.following}</b>
+                                    </div>
+                                </div>
+
+                                {user.isMine ? <Button className="mt-3" shape="round" icon="edit" type="primary" onClick={this.showModal}>Edit</Button> : <Button className="mt-3" shape="round" icon="plus" type="primary">Follow</Button>}
+
                                 <Divider />
                             </div>
-                            {posts.map(item => (
-                                <div>
-                                    <Post post={item.post} likes={item.numberOfLikes} isLiked={item.isLiked} user={user} comment={item.comments}></Post>
-                                    <Divider />
-                                </div>
+                            {posts.map((item, i) => (
+                                <Post key={"post" + i} getMyPosts={this.props.getMyPosts} post={item.post} likes={item.numberOfLikes} isLiked={item.isLiked} user={user} comment={item.comments} />
                             ))}
                         </div>
                     </Content>
@@ -184,7 +274,7 @@ class ProfileContent extends Component {
                             <ChangePassword user={user} reloadUser={this.props.reloadUser} />
                         </div>
                     </Modal>
-                </Layout> : ""
+                </Layout> : this.state.loading ? <div className="text-primary text-center" style={{ marginTop: window.innerHeight / 2 - 100, marginLeft: window.innerWidth / 2 }}><Icon type="loading" style={{ fontSize: "100px", fontWeight: "bold" }} /></div> : <div style={{ width: "100%" }}><h1 className="text-primary text-center" style={{ marginTop: window.innerHeight / 2 - 100 }}>User does not exist! :(</h1></div>
         );
     }
 }

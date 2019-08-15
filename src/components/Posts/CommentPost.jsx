@@ -18,21 +18,24 @@ class PostComment extends Component {
                         style={{
                             fontSize: "18px"
                         }}>
-                        {com.isMy ? user !== undefined && user !== null ? user.firstName + " " + user.lastName : com.user.firstName + " " + com.user.lastName : com.user.firstName + " " + com.user.lastName}</b><p style={{
+                        {com.user.firstName + " " + com.user.lastName}</b><p style={{
                             marginTop: -5,
                             color: "#9c9a9a"
-                        }}>{com.isMy ? user !== undefined ? "@" + user.username : "@" + com.user.username : "@" + com.user.username}</p></div>}
+                        }}>{"@" + com.user.username}</p></div>}
                 avatar={
                     <Avatar
                         icon="user"
-                        src={com.isMy ? user !== undefined ? user.image : com.user.image : com.user.image}
+                        src={com.user.image}
                         alt="user"
                     />
                 }
                 content={
-                    <p className="mt-4" style={{
-                        fontSize: "20px"
-                    }}>
+                    <p
+                        className="mt-4"
+                        style={{
+                            fontSize: "20px"
+                        }}
+                    >
                         {com.text}
                     </p>
                 }
@@ -45,6 +48,7 @@ class PostComment extends Component {
                 }
             />
         );
+
     }
 }
 

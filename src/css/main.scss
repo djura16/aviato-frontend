@@ -62,3 +62,25 @@ textarea {
 .ant-comment-content-author-time {
   margin-top: 1px;
 }
+
+.followers,
+.following {
+  font-size: 17px;
+  // width: 34%;
+  margin: auto;
+  margin-top: -12px;
+}
+
+.followers-text {
+  float: right;
+}
+
+.following-text {
+  float: left;
+}
+
+.line {
+  width: 1%;
+  font-size: 15px;
+  margin: auto;
+}
