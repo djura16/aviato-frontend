@@ -106,7 +106,6 @@ class Post extends Component {
         const post = this.props.post;
         const user = this.props.user;
         const comments = this.props.comment;
-        console.log(comments);
         const actions = [
             <span key="comment-basic-like">
                 <Tooltip title="Like">

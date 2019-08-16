@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Layout, Avatar, Divider, Button, Modal, Icon, Upload, message, Row, Col } from 'antd';
+import { Layout, Avatar, Divider, Button, Modal, Icon, Upload, message } from 'antd';
 import Post from "../Posts/Post"
 import { beforeUpload, getBase64 } from "../../actions/imageUpload"
 import AvatarEditor from "react-avatar-editor"
@@ -19,6 +19,76 @@ class ProfileContent extends Component {
         error: false,
         followers: 0,
         following: 0
+    }
+
+    followUser = () => {
+        let username = window.location.pathname.split("/");
+        let bearer_token = sessionStorage.getItem("token");
+        let user = {
+            username: username[3]
+        }
+        fetch('/api/Following/follow', {
+            method: "post",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + bearer_token
+            },
+            body: JSON.stringify(user)
+        })
+            .then(response => {
+                if (response.ok) {
+                    this.setState({
+                        isResponseOk: true
+                    })
+                }
+                else {
+                    this.setState({
+                        isResponseOk: false
+                    })
+                }
+                response.json()
+            })
+            .then(data => {
+                if (this.state.isResponseOk) {
+                    this.loadUser();
+                }
+            })
+    }
+
+    unfollowUser = () => {
+        let username = window.location.pathname.split("/");
+        let bearer_token = sessionStorage.getItem("token");
+        let user = {
+            username: username[3]
+        }
+        fetch('/api/Following/unfollow', {
+            method: "post",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + bearer_token
+            },
+            body: JSON.stringify(user)
+        })
+            .then(response => {
+                if (response.ok) {
+                    this.setState({
+                        isResponseOk: true
+                    })
+                }
+                else {
+                    this.setState({
+                        isResponseOk: false
+                    })
+                }
+                response.json()
+            })
+            .then(data => {
+                if (this.state.isResponseOk) {
+                    this.loadUser();
+                }
+            })
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -165,6 +235,7 @@ class ProfileContent extends Component {
                 })
                 .then(data => {
                     this.props.reloadUser();
+                    this.loadUser();
                     this.setState({
                         imageUrl: null
                     })
@@ -183,7 +254,7 @@ class ProfileContent extends Component {
             user !== null ?
                 <Layout>
                     <Header id="header" style={{ background: '#fff', padding: 0, marginLeft: onPhone ? "0" : "200px" }}>
-                        <b><h3 className="ml-3">{user.firstName} {user.lastName}</h3></b>
+                        <b><h1 className="ml-3">{user.firstName} {user.lastName}</h1></b>
                     </Header>
                     <Content id="content" className={onPhone ? "content mx-1" : "content"} style={{ margin: '24px 20% 0', marginLeft: "30%" }}>
                         <div style={{ padding: 24, minHeight: window.innerHeight - 158 }}>
@@ -212,13 +283,36 @@ class ProfileContent extends Component {
                                     </div>
                                 </div>
 
-                                {user.isMine ? <Button className="mt-3" shape="round" icon="edit" type="primary" onClick={this.showModal}>Edit</Button> : <Button className="mt-3" shape="round" icon="plus" type="primary">Follow</Button>}
+                                {user.isMine ?
+                                    <Button
+                                        className="mt-3"
+                                        shape="round"
+                                        icon="edit"
+                                        type="primary"
+                                        onClick={this.showModal}
+                                    >Edit</Button> :
+                                    user.isFollowing ?
+                                        <Button
+                                            className="mt-3"
+                                            shape="round"
+                                            icon="minus"
+                                            type="primary"
+                                            onClick={this.unfollowUser}
+                                        >Unfollow</Button> :
+                                        <Button
+                                            className="mt-3"
+                                            shape="round"
+                                            icon="plus"
+                                            type="primary"
+                                            onClick={this.followUser}
+                                        >Follow</Button>}
 
                                 <Divider />
                             </div>
-                            {posts.map((item, i) => (
-                                <Post key={"post" + i} getMyPosts={this.props.getMyPosts} post={item.post} likes={item.numberOfLikes} isLiked={item.isLiked} user={user} comment={item.comments} />
-                            ))}
+                            {user.isMine || user.isPublic || user.isFollowing ?
+                                posts.map((item, i) => (
+                                    <Post key={"post" + i} getMyPosts={this.props.getMyPosts} post={item.post} likes={item.numberOfLikes} isLiked={item.isLiked} user={user} comment={item.comments} />
+                                )) : <h1 className="text-center text-primary">Follow user to see his/her posts!</h1>}
                         </div>
                     </Content>
                     <Footer id="footer" style={{ textAlign: 'center', marginLeft: onPhone ? "0" : "200px" }}>Twitter Quantox ©2019 Created by Aviato</Footer>

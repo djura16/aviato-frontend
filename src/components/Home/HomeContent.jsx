@@ -1,12 +1,70 @@
 import React, { Component } from 'react';
-import { Layout, Avatar, Input, Button } from 'antd';
+import { Layout, Avatar, Input, Button, Select, Icon } from 'antd';
+import Post from "../Posts/Post";
+import { Link } from "react-router-dom";
 
 const { Header, Content, Footer } = Layout;
 const { TextArea } = Input;
+const { Option } = Select;
 
 class HomeContent extends Component {
     state = {
-        text: ""
+        text: "",
+        posts: [],
+        searchUser: [],
+        searchInput: ""
+    }
+
+    componentDidMount() {
+        this.getAllPosts()
+    }
+
+    getAllPosts = () => {
+
+        //SREDITI ZA SIGURNOST
+        let bearer_token = sessionStorage.getItem("token");
+        fetch("/api/Post/getAllPosts", {
+            method: "get",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + bearer_token
+            }
+        }).then(response => response.json())
+            .then(data => {
+                this.setState({
+                    posts: data
+                })
+            })
+    }
+
+    handleSearch = value => {
+        let searchUser = {
+            search: value
+        }
+        let bearer_token = sessionStorage.getItem("token");
+        fetch("/api/User/searchUsers", {
+            method: "post",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + bearer_token
+            },
+            body: JSON.stringify(searchUser)
+        }).then(response => response.json())
+            .then(data => {
+                this.setState({
+                    searchUser: data
+                })
+            })
+    }
+
+    searchUser = (value) => {
+
+        this.setState({
+            searchInput: value
+        })
+
     }
 
     handleText = (input) => {
@@ -33,16 +91,61 @@ class HomeContent extends Component {
             body: JSON.stringify(post)
         })
             .then(response => response.json())
-            .then(data => console.log(data))
+            .then(data => this.getAllPosts())
+
+        this.setState({
+            text: ""
+        })
     }
 
     render() {
         let onPhone = this.props.onPhone;
         let user = this.props.user;
+        const posts = this.state.posts;
 
         return <Layout>
             <Header id="header" style={{ background: '#fff', padding: 0, marginLeft: onPhone ? "0" : "200px" }}>
-                <h1>Home</h1>
+                <h1 style={{ display: "inline-block" }}>Home</h1>
+                <div style={{ width: 300, display: "inline-block", float: "right", marginRight: "25%" }}>
+                    {/* <Search
+                        name="search"
+                        placeholder="Search users"
+                        onChange={value => console.log(value.target.value)}
+                        
+                    /> */}
+                    {/* URADIRI PLACEHOLDER OVDE */}
+                    <Select
+                        showSearch
+                        value={this.state.searchInput}
+                        placeholder="Search users"
+                        style={{ width: "300px" }}
+                        defaultActiveFirstOption={false}
+                        showArrow={false}
+                        filterOption={false}
+                        onSearch={this.handleSearch}
+                        onChange={this.searchUser}
+                        notFoundContent={null}
+                    >
+                        {this.state.searchUser.map((item, i) =>
+                            <Option key={i} >
+                                <Link to={`/Home/user/${item.username}`}>
+                                    <Avatar className="home-feed-avatar" size={40} icon="user" src={item.image} />
+                                    <span className="home-feed-avatar ml-3">
+                                        <h5 className="text-primary">{item.name}</h5>
+                                        <p
+                                            style={{
+                                                marginTop: -14,
+                                                // marginLeft: -40,
+                                                color: "#9c9a9a",
+                                                float: "left"
+                                            }}
+                                        >{"@" + item.username}</p>
+                                    </span>
+                                </Link>
+                            </Option>
+                        )}
+                    </Select>
+                </div>
             </Header>
             <Content id="content-post" className={onPhone ? "content mx-1" : "content"} style={{ marginLeft: "30%" }}>
                 <div className="text-center home-post">
@@ -53,8 +156,9 @@ class HomeContent extends Component {
                             <p
                                 style={{
                                     marginTop: -14,
-                                    marginLeft: -40,
-                                    color: "#9c9a9a"
+                                    // marginLeft: -40,
+                                    color: "#9c9a9a",
+                                    float: "left"
                                 }}
                             >{user !== null ? "@" + user.username : ""}</p>
                         </span>
@@ -67,7 +171,11 @@ class HomeContent extends Component {
                 </div>
             </Content>
             <Content id="content" className={onPhone ? "content mx-1 mt-5" : "content mt-5"} style={{ marginLeft: "30%" }} >
-                <div style={{ padding: 24, background: '#fff', minHeight: window.innerHeight - 158 }}>content</div>
+                <div style={{ padding: 24, minHeight: window.innerHeight - 158 }}>
+                    {posts.map((item, i) => (
+                        <Post key={"post" + i} getMyPosts={this.getAllPosts} post={item.post} likes={item.numberOfLikes} isLiked={item.isLiked} user={item.post.userId} comment={item.comments} />
+                    ))}
+                </div>
             </Content>
             <Footer id="footer" style={{ textAlign: 'center', marginLeft: onPhone ? "0" : "200px" }}>Twitter Quantox ©2019 Created by Aviato</Footer>
         </Layout>;
