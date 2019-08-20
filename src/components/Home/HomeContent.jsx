@@ -16,26 +16,7 @@ class HomeContent extends Component {
     }
 
     componentDidMount() {
-        this.getAllPosts()
-    }
-
-    getAllPosts = () => {
-
-        //SREDITI ZA SIGURNOST
-        let bearer_token = sessionStorage.getItem("token");
-        fetch("/api/Post/getAllPosts", {
-            method: "get",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + bearer_token
-            }
-        }).then(response => response.json())
-            .then(data => {
-                this.setState({
-                    posts: data
-                })
-            })
+        this.props.getAllPosts()
     }
 
     handleSearch = value => {
@@ -91,7 +72,7 @@ class HomeContent extends Component {
             body: JSON.stringify(post)
         })
             .then(response => response.json())
-            .then(data => this.getAllPosts())
+            .then(data => this.props.getAllPosts())
 
         this.setState({
             text: ""
@@ -101,7 +82,7 @@ class HomeContent extends Component {
     render() {
         let onPhone = this.props.onPhone;
         let user = this.props.user;
-        const posts = this.state.posts;
+        const posts = this.props.posts;
 
         return <Layout>
             <Header id="header" style={{ background: '#fff', padding: 0, marginLeft: onPhone ? "0" : "200px" }}>
@@ -173,7 +154,7 @@ class HomeContent extends Component {
             <Content id="content" className={onPhone ? "content mx-1 mt-5" : "content mt-5"} style={{ marginLeft: "30%" }} >
                 <div style={{ padding: 24, minHeight: window.innerHeight - 158 }}>
                     {posts.map((item, i) => (
-                        <Post key={"post" + i} getMyPosts={this.getAllPosts} post={item.post} likes={item.numberOfLikes} isLiked={item.isLiked} user={item.post.userId} comment={item.comments} />
+                        <Post key={"post" + i} getMyPosts={this.props.getAllPosts} post={item.post} likes={item.numberOfLikes} isLiked={item.isLiked} user={item.post.userId} comment={item.comments} />
                     ))}
                 </div>
             </Content>

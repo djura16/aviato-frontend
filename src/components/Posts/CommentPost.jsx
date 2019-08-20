@@ -6,7 +6,6 @@ class PostComment extends Component {
     state = {}
     render() {
         const com = this.props.comment;
-        const user = this.props.user;
         return (
             <Comment
                 style={{

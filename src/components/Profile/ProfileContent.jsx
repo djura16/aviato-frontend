@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
-import { Layout, Avatar, Divider, Button, Modal, Icon, Upload, message } from 'antd';
+import { Layout, Avatar, Divider, Button, Modal, Icon, Upload, message, Row, Col } from 'antd';
 import Post from "../Posts/Post"
 import { beforeUpload, getBase64 } from "../../actions/imageUpload"
 import AvatarEditor from "react-avatar-editor"
 import ChangeName from "./ChangeName"
 import ChangeEmail from "./ChangeEmail"
 import ChangePassword from "./ChangePassword"
+import ChangePrivacy from "./ChangePrivacy"
+import ProfileFollowers from "./ProfileFollowers"
+import { getUser } from "../../actions/UserActions"
 
 const { Header, Content, Footer } = Layout;
 
@@ -18,51 +21,18 @@ class ProfileContent extends Component {
         loading: true,
         error: false,
         followers: 0,
-        following: 0
+        following: 0,
+        seeFollower: false,
+        modalOption: null
     }
 
-    followUser = () => {
+    followUnfollowUser = (action) => {
         let username = window.location.pathname.split("/");
         let bearer_token = sessionStorage.getItem("token");
         let user = {
             username: username[3]
         }
-        fetch('/api/Following/follow', {
-            method: "post",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + bearer_token
-            },
-            body: JSON.stringify(user)
-        })
-            .then(response => {
-                if (response.ok) {
-                    this.setState({
-                        isResponseOk: true
-                    })
-                }
-                else {
-                    this.setState({
-                        isResponseOk: false
-                    })
-                }
-                response.json()
-            })
-            .then(data => {
-                if (this.state.isResponseOk) {
-                    this.loadUser();
-                }
-            })
-    }
-
-    unfollowUser = () => {
-        let username = window.location.pathname.split("/");
-        let bearer_token = sessionStorage.getItem("token");
-        let user = {
-            username: username[3]
-        }
-        fetch('/api/Following/unfollow', {
+        fetch(`/api/Following/${action}`, {
             method: "post",
             headers: {
                 Accept: "application/json",
@@ -137,56 +107,31 @@ class ProfileContent extends Component {
 
     loadUser = () => {
         let username = window.location.pathname.split("/");
-        let bearer_token = sessionStorage.getItem("token");
-        fetch(`/api/User/getUserByUsername?username=${username[3]}`, {
-            method: "get",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + bearer_token
+        getUser(username[3], data => {
+            if (data.msg === undefined) {
+                this.setState({
+                    user: data,
+                    loading: false,
+                    modalOption: null
+                });
+                this.props.getMyPosts(username[3]);
+                this.getFollowers();
+            }
+            else {
+                this.setState({
+                    error: true,
+                    loading: false
+                })
             }
         })
-            .then(response => {
-                if (response.ok) {
-                    this.setState({
-                        isResponseOk: true
-                    })
-                }
-                else {
-                    this.setState({
-                        isResponseOk: false
-                    })
-                }
-                return response.json()
-            })
-            .then(data => {
-                if (this.state.isResponseOk) {
-                    this.props.getMyPosts(username[3])
-                    this.getFollowers();
-                    this.setState({
-                        user: data,
-                        loading: false
-                    })
-                }
-                else {
-                    this.setState({
-                        loading: false,
-                        error: true
-                    })
-                }
-            })
     }
 
-    showModal = () => {
-        this.setState({
-            modalVisible: true
-        })
-    }
-
-    closeModal = () => {
-        this.setState({
-            modalVisible: false
-        })
+    showCloseModal = () => {
+        this.setState(state => (
+            {
+                modalVisible: !state.modalVisible
+            }
+        ))
     }
 
     handleImageChange = info => {
@@ -203,6 +148,19 @@ class ProfileContent extends Component {
                 }),
             );
         }
+    }
+
+    openFollowersModal = () => {
+        this.setState({
+            seeFollower: true
+        })
+    }
+
+    closeFollowersModal = () => {
+        this.setState({
+            seeFollower: false,
+            modalOption: null
+        })
     }
 
     cancelImageChange = () => {
@@ -266,22 +224,48 @@ class ProfileContent extends Component {
                                     color: "#9c9a9a"
                                 }}
                                 >{"@" + user.username}</p>
-                                <div className="followers text-center">
-                                    <div className="followers-text">
-                                        <b>Followers</b>
-                                        <br />
-                                        <b>{this.state.followers}</b>
-                                    </div>
-                                </div>
+                                <Row>
+                                    <Col md={8} sm={8} lg={8}>
+                                        <div className="followers text-center" style={{ cursor: "pointer" }}>
+                                            <div
+                                                className="followers-text"
+                                                onClick={() => this.setState({
+                                                    modalOption: 1
+                                                }, () => this.openFollowersModal())}>
+                                                <b>Followers</b>
+                                                <br />
+                                                <b>{this.state.followers}</b>
+                                            </div>
+                                        </div>
+                                    </Col>
+                                    <Col md={8} sm={8} lg={8}>
+                                        <div className="followers text-center">
+                                            <div>
+                                                <b>Posts</b>
+                                                <br />
+                                                <b>{posts.length}</b>
+                                            </div>
+                                        </div>
+                                    </Col>
+                                    <Col md={8} sm={8} lg={8}>
+                                        <div className="following" style={{ cursor: "pointer" }}>
+                                            <div
+                                                className="following-text"
+                                                onClick={() => this.setState({
+                                                    modalOption: 0
+                                                }, () => this.openFollowersModal())}>
+                                                <b>Following</b>
+                                                <br />
+                                                <b>{this.state.following}</b>
+                                            </div>
+                                        </div>
+                                    </Col>
+                                </Row>
 
 
-                                <div className="following">
-                                    <div className="following-text">
-                                        <b>Following</b>
-                                        <br />
-                                        <b>{this.state.following}</b>
-                                    </div>
-                                </div>
+
+
+
 
                                 {user.isMine ?
                                     <Button
@@ -289,7 +273,7 @@ class ProfileContent extends Component {
                                         shape="round"
                                         icon="edit"
                                         type="primary"
-                                        onClick={this.showModal}
+                                        onClick={this.showCloseModal}
                                     >Edit</Button> :
                                     user.isFollowing ?
                                         <Button
@@ -297,15 +281,25 @@ class ProfileContent extends Component {
                                             shape="round"
                                             icon="minus"
                                             type="primary"
-                                            onClick={this.unfollowUser}
+                                            onClick={() => this.followUnfollowUser("unfollow")}
                                         >Unfollow</Button> :
-                                        <Button
-                                            className="mt-3"
-                                            shape="round"
-                                            icon="plus"
-                                            type="primary"
-                                            onClick={this.followUser}
-                                        >Follow</Button>}
+                                        user.requestSend ?
+                                            <Button
+                                                className="mt-3"
+                                                shape="round"
+                                                icon="minus"
+                                                type="danger"
+                                                onClick={() => this.followUnfollowUser("unfollow")}
+                                            >
+                                                Request sent
+                                        </Button> :
+                                            <Button
+                                                className="mt-3"
+                                                shape="round"
+                                                icon="plus"
+                                                type="primary"
+                                                onClick={() => this.followUnfollowUser("follow")}
+                                            >Follow</Button>}
 
                                 <Divider />
                             </div>
@@ -319,9 +313,9 @@ class ProfileContent extends Component {
                     <Modal
                         title="EDIT PROFILE"
                         visible={this.state.modalVisible}
-                        onCancel={this.closeModal}
+                        onCancel={this.showCloseModal}
                         footer={[
-                            <Button key="back" onClick={this.closeModal}>
+                            <Button key="back" onClick={this.showCloseModal}>
                                 Close
                             </Button>
                         ]}
@@ -366,8 +360,11 @@ class ProfileContent extends Component {
                             <ChangeEmail user={user} reloadUser={this.props.reloadUser} />
                             <Divider />
                             <ChangePassword user={user} reloadUser={this.props.reloadUser} />
+                            <Divider />
+                            <ChangePrivacy user={user} reloadUser={this.props.reloadUser} />
                         </div>
                     </Modal>
+                    <ProfileFollowers visibleModal={this.state.seeFollower} modalOption={this.state.modalOption} closeFollowersModal={this.closeFollowersModal} loadUser={this.loadUser} />
                 </Layout> : this.state.loading ? <div className="text-primary text-center" style={{ marginTop: window.innerHeight / 2 - 100, marginLeft: window.innerWidth / 2 }}><Icon type="loading" style={{ fontSize: "100px", fontWeight: "bold" }} /></div> : <div style={{ width: "100%" }}><h1 className="text-primary text-center" style={{ marginTop: window.innerHeight / 2 - 100 }}>User does not exist! :(</h1></div>
         );
     }

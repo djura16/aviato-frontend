@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Layout, Menu, Icon, Avatar, Button, Badge } from 'antd';
+import { Layout, Menu, Icon, Avatar, Badge } from 'antd';
 import HomeContent from "./HomeContent"
 import ProfileContent from "../Profile/ProfileContent"
 import Requests from "../Followers/Requests"
@@ -8,6 +8,9 @@ import {
     Switch,
     Route
 } from "react-router-dom";
+import { getUser } from "../../actions/UserActions"
+import { logOutUser } from "../../actions/LoginRegister"
+import { signalR } from "../../actions/SignalRActions"
 
 const { Sider, Header } = Layout;
 
@@ -20,7 +23,10 @@ class Home extends Component {
         propsUpdate: false,
         isResponseOk: false,
         requests: [],
-        interval: null
+        interval: null,
+        hubConnection: null,
+        online: [],
+        posts: []
     }
 
     onCollapse = collapsed => {
@@ -33,27 +39,22 @@ class Home extends Component {
         clearInterval(this.state.interval);
     }
 
-    getUser = () => {
-        let username = JSON.parse(localStorage.getItem("user")).username;
-        let bearer_token = sessionStorage.getItem("token");
-        fetch(`/api/User/getUserByUsername?username=${username}`, {
-            method: "get",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + bearer_token
-            }
+    reloadUser = () => {
+        getUser(null, data => {
+            console.log(data);
+            this.setState(state => (
+                {
+                    user: data,
+                    propsUpdate: !state.propsUpdate
+                }
+            ));
+            localStorage.setItem("user", JSON.stringify(data));
         })
-            .then(response => response.json())
-            .then(data => {
-                localStorage.setItem("user", JSON.stringify(data));
-                this.setState({
-                    user: data
-                })
-            })
+
     }
 
     componentDidMount() {
+
         setTimeout(() => {
             let user = JSON.parse(localStorage.getItem("user"));
             this.setState({
@@ -70,6 +71,47 @@ class Home extends Component {
         this.setState({
             interval
         })
+
+        // setInterval(() => {
+        //     console.log(navigator.onLine);
+        // }, 1000)
+
+
+        setTimeout(() => {
+            let username = JSON.parse(localStorage.getItem("user")).username;
+            signalR(username, (hubConnection, data) => {
+                this.setState({
+                    hubConnection,
+                    online: data
+                }, () => {
+                    this.state.hubConnection
+                        .start()
+                        .then(() => console.log("Connected"))
+                        .catch(e => {
+                            console.log(e);
+                            console.log("Error connecting");
+                        });
+                })
+            })
+        }, 500);
+    }
+
+    getAllPosts = () => {
+        //SREDITI ZA SIGURNOST
+        let bearer_token = sessionStorage.getItem("token");
+        fetch("/api/Post/getAllPosts", {
+            method: "get",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + bearer_token
+            }
+        }).then(response => response.json())
+            .then(data => {
+                this.setState({
+                    posts: data
+                })
+            })
     }
 
     getMyPosts = (username = null) => {
@@ -206,7 +248,12 @@ class Home extends Component {
                                     </Link>
                                 </Menu.Item>
                                 <Menu.Item key="3">
-                                    <Link onClick={this.clearStorage} to="/Login">
+                                    <Link
+                                        onClick={() => {
+                                            this.clearStorage();
+                                            logOutUser()
+                                        }}
+                                        to="/Login">
                                         <Icon type="logout" />
 
                                     </Link>
@@ -296,9 +343,9 @@ class Home extends Component {
                             </Menu>
                         </Sider>}
                     <Switch>
-                        <Route exact={true} path="/Home/feed" render={() => <HomeContent onPhone={this.state.onPhone} user={this.state.user} />} />
+                        <Route exact={true} path="/Home/feed" render={() => <HomeContent onPhone={this.state.onPhone} user={this.state.user} posts={this.state.posts} getAllPosts={this.getAllPosts} />} />
                         <Route exact={true} path='/Home/user/request' render={() => <Requests user={this.state.user} onPhone={this.state.onPhone} requests={this.state.requests} reloadRequests={this.loadRequests} />} />
-                        <Route exact={true} path='/Home/user/:username' render={() => <ProfileContent propsUpdate={this.state.propsUpdate} onPhone={this.state.onPhone} user={this.state.user} reloadUser={this.getUser} getMyPosts={this.getMyPosts} posts={this.state.myPosts} />} />
+                        <Route exact={true} path='/Home/user/:username' render={() => <ProfileContent propsUpdate={this.state.propsUpdate} onPhone={this.state.onPhone} user={this.state.user} reloadUser={this.reloadUser} getMyPosts={this.getMyPosts} posts={this.state.myPosts} />} />
                     </Switch>
                 </Layout> : ""
         );

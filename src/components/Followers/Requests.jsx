@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Layout, List, Avatar, Divider, Button, Modal, Icon, Upload, message } from 'antd';
+import { Layout, List, Avatar, Button, message } from 'antd';
 
 const { Header, Content, Footer } = Layout;
 
@@ -9,12 +9,12 @@ class Requests extends Component {
         isResponseOk: false
     }
 
-    acceptFollow = (id) => {
+    acceptDeclineFollow = (id, action) => {
         let bearer_token = sessionStorage.getItem("token");
         let follow = {
             id
         }
-        fetch("/api/Following/acceptFollow", {
+        fetch(`/api/Following/${action}`, {
             method: "post",
             headers: {
                 Accept: "application/json",
@@ -44,45 +44,6 @@ class Requests extends Component {
                 else {
                     message.error(data.msg);
                 }
-            })
-    }
-
-    declineFollow = (id) => {
-        let bearer_token = sessionStorage.getItem("token");
-        let follow = {
-            id
-        }
-        fetch("/api/Following/declineFollow", {
-            method: "post",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + bearer_token
-            },
-            body: JSON.stringify(follow)
-        })
-            .then(response => {
-                if (response.ok) {
-                    this.setState({
-                        isResponseOk: true
-                    })
-                }
-                else {
-                    this.setState({
-                        isResponseOk: false
-                    })
-                }
-                return response.json()
-            })
-            .then(data => {
-                if (this.state.isResponseOk) {
-                    this.props.reloadRequests();
-                    message.success(data.msg);
-                }
-                else {
-                    message.error(data.msg);
-                }
-
             })
     }
 
@@ -113,8 +74,8 @@ class Requests extends Component {
                                             <br />
                                             <p style={{ marginTop: "-8px" }}>{"@" + item.follower.username}</p>
                                         </div>
-                                        <Button onClick={() => this.declineFollow(item.id)} icon="close" type="danger" style={{ position: "absolute", right: 0 }}></Button>
-                                        <Button onClick={() => this.acceptFollow(item.id)} icon="check" type="primary" style={{ position: "absolute", right: 50 }}>Accept</Button>
+                                        <Button onClick={() => this.acceptDeclineFollow(item.id, "declineFollow")} icon="close" type="danger" style={{ position: "absolute", right: 0 }}></Button>
+                                        <Button onClick={() => this.acceptDeclineFollow(item.id, "acceptFollow")} icon="check" type="primary" style={{ position: "absolute", right: 50 }}>Accept</Button>
                                     </List.Item>
                                 }
                             />

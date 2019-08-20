@@ -68,7 +68,7 @@ textarea {
 .followers,
 .following {
   font-size: 17px;
-  margin: auto;
+  width: 100%;
   margin-top: -12px;
 }
 

@@ -57,6 +57,7 @@ class Post extends Component {
     }
 
     handleCommentText = e => {
+
         let { name, value } = e.target;
 
         this.setState({
