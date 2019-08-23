@@ -11,8 +11,7 @@ class Post extends Component {
         isLiked: this.props.isLiked,
         likes: this.props.likes,
         modalVisible: false,
-        commentText: "",
-        isResponseOk: false
+        commentText: ""
     };
 
     postComment = () => {
@@ -93,10 +92,7 @@ class Post extends Component {
         })
             .then(response => {
                 if (response.ok) {
-                    this.setState(prevState => ({
-                        isLiked: !prevState.isLiked,
-                        likes: prevState.isLiked ? prevState.likes - 1 : prevState.likes + 1
-                    }));
+                    this.props.getMyPosts()
                 }
                 return response.json()
             })
@@ -111,16 +107,18 @@ class Post extends Component {
             <span key="comment-basic-like">
                 <Tooltip title="Like">
                     <Icon
+                        style={{ fontSize: "16px" }}
                         type="like"
-                        theme={this.state.isLiked ? 'filled' : 'outlined'}
+                        theme={this.props.isLiked ? 'filled' : 'outlined'}
                         onClick={this.handleLike}
                     />
                 </Tooltip>
-                <span style={{ paddingLeft: 8, cursor: 'auto' }}>{this.state.likes}</span>
+                <span style={{ paddingLeft: 8, cursor: 'auto' }}>{this.props.likes}</span>
             </span>,
             <span key="comment-basic-like">
                 <Tooltip title="Comment">
                     <Icon
+                        style={{ fontSize: "16px" }}
                         type="message"
                         theme={comments.length ? 'filled' : 'outlined'}
                         onClick={this.openComments}
@@ -133,12 +131,6 @@ class Post extends Component {
         return (
             <div>
                 <Comment
-                    style={{
-                        border: "2px solid #e4e4e4",
-                        backgroundColor: "#fff",
-                        borderRadius: "20px",
-                        padding: "5px"
-                    }}
                     actions={actions}
                     author={<div>
                         <b
@@ -152,13 +144,14 @@ class Post extends Component {
                             }}>{user !== undefined ? "@" + user.username : "@" + post.userId.username}</p></div>}
                     avatar={
                         <Avatar
+
                             icon="user"
                             src={user !== undefined ? user.image : post.userId.image}
                             alt="user"
                         />
                     }
                     content={
-                        <p className="mt-4" style={{
+                        <p id={`post${post.id}`} className="mt-4" style={{
                             fontSize: "20px"
                         }}>
                             {post.post}
@@ -252,7 +245,7 @@ class Post extends Component {
                         {/* </div> */}
                     </Modal>
                 </Comment>
-                <Divider />
+                {/* <Divider /> */}
             </div>
         );
     }

@@ -1,3 +1,20 @@
+body {
+  background: linear-gradient(-45deg, #5badfa 50%, transparent 50%);
+  background-color: #e6eaee;
+  height: 100%;
+  margin: 0;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+a {
+  color: #1a67af;
+}
+
+a:hover {
+  color: #1890ff;
+}
+
 .avatar-profile {
   border: 3px solid #c2d7ea;
   z-index: 1;
@@ -44,12 +61,74 @@ textarea {
   resize: none;
 }
 
+.ant-modal-body .ant-comment {
+  background: transparent;
+  border: none;
+}
+
+.unread {
+  background: rgba(126, 171, 255, 0.418);
+}
+
+.ant-layout-footer {
+  background: #0a3a68;
+  color: #b1aeae;
+}
+
+.ant-comment {
+  background: #f0f2f5;
+  border: 2px solid rgba(77, 77, 77, 0.562);
+  border-radius: 20px;
+  padding: 5px;
+  margin-bottom: 30px;
+}
+
+.ant-comment span {
+  color: #7c7c7c;
+}
+
+.ant-comment .ant-comment {
+  border: none;
+  margin-bottom: 0px;
+}
+
+.ant-layout-header h1 {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.requests {
+  background: #fff;
+  border: 2px solid rgba(77, 77, 77, 0.562);
+  border-radius: 15px;
+  padding: 15px;
+}
+
+.ant-layout-header {
+  padding: 0;
+}
+
+.form {
+  background: rgba(255, 255, 255, 0.671);
+  border: 2px solid rgba(77, 77, 77, 0.562);
+  border-radius: 15px;
+  padding: 25px;
+}
+
 .content {
+  border-radius: 15px;
   margin: 24px 20% 0;
+}
+
+.content-post {
+  margin-top: 200px;
+  background: transparent;
+  border: none;
+  border-radius: 15px;
 }
 
 .home-post {
   position: relative;
+  margin-top: 60px;
 }
 
 .home-post-button {
@@ -68,6 +147,7 @@ textarea {
 .followers,
 .following {
   font-size: 17px;
+  display: inline-block;
   width: 100%;
   margin-top: -12px;
 }
@@ -78,6 +158,10 @@ textarea {
 
 .following-text {
   float: left;
+}
+
+.posts-text {
+  margin: auto;
 }
 
 .line {
@@ -100,5 +184,9 @@ textarea {
 
 ::-webkit-scrollbar-thumb:hover {
   background: #5324ac;
+}
+
+.ant-layout {
+  background: transparent;
 }
 /*# sourceMappingURL=main.css.map */

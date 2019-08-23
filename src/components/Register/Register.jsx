@@ -74,7 +74,7 @@ class Register extends Component {
                     <Row>
                         <Col sm={1} md={3}></Col>
                         <Col sm={10} md={6}>
-                            <Form onSubmit={this.handleSubmit}>
+                            <Form onSubmit={this.handleSubmit} className="form">
                                 <h1>Register</h1>
                                 <Form.Item label="First name">
                                     {getFieldDecorator('firstName', {

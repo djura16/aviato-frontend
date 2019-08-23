@@ -21,3 +21,13 @@ export function signalR(username, callback) {
       callback(hubConnection, data);
     });
 }
+
+export function notificationSignal(callback) {
+  let hubConnection;
+
+  hubConnection = new HubConnectionBuilder()
+    .withUrl("http://localhost:5001/posthub")
+    .build();
+
+  callback(hubConnection);
+}

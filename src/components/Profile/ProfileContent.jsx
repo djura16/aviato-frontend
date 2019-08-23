@@ -211,12 +211,12 @@ class ProfileContent extends Component {
         return (
             user !== null ?
                 <Layout>
-                    <Header id="header" style={{ background: '#fff', padding: 0, marginLeft: onPhone ? "0" : "200px" }}>
-                        <b><h1 className="ml-3">{user.firstName} {user.lastName}</h1></b>
+                    <Header id="header" style={{ padding: 0, marginLeft: onPhone ? "0" : "200px" }}>
+                        <h1 className="ml-3">{user.firstName} {user.lastName}</h1>
                     </Header>
                     <Content id="content" className={onPhone ? "content mx-1" : "content"} style={{ margin: '24px 20% 0', marginLeft: "30%" }}>
                         <div style={{ padding: 24, minHeight: window.innerHeight - 158 }}>
-                            <div className="text-center">
+                            <div className="text-center mb-5">
                                 <Avatar style={{ border: "3px solid #c2d7ea" }} size={100} icon="user" src={user.image}></Avatar>
                                 <h4>{user.firstName + " " + user.lastName}</h4>
                                 <p style={{
@@ -225,7 +225,7 @@ class ProfileContent extends Component {
                                 }}
                                 >{"@" + user.username}</p>
                                 <Row>
-                                    <Col md={8} sm={8} lg={8}>
+                                    <Col md={8} sm={4} lg={8} xs={8}>
                                         <div className="followers text-center" style={{ cursor: "pointer" }}>
                                             <div
                                                 className="followers-text"
@@ -238,16 +238,16 @@ class ProfileContent extends Component {
                                             </div>
                                         </div>
                                     </Col>
-                                    <Col md={8} sm={8} lg={8}>
+                                    <Col md={8} sm={4} lg={8} xs={8}>
                                         <div className="followers text-center">
-                                            <div>
+                                            <div className="posts-text">
                                                 <b>Posts</b>
                                                 <br />
                                                 <b>{posts.length}</b>
                                             </div>
                                         </div>
                                     </Col>
-                                    <Col md={8} sm={8} lg={8}>
+                                    <Col md={8} sm={4} lg={8} xs={8}>
                                         <div className="following" style={{ cursor: "pointer" }}>
                                             <div
                                                 className="following-text"
@@ -301,7 +301,7 @@ class ProfileContent extends Component {
                                                 onClick={() => this.followUnfollowUser("follow")}
                                             >Follow</Button>}
 
-                                <Divider />
+                                {/* <Divider /> */}
                             </div>
                             {user.isMine || user.isPublic || user.isFollowing ?
                                 posts.map((item, i) => (

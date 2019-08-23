@@ -27,7 +27,7 @@ export function loginUser(values, callback) {
         sessionStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data));
       }
-      callback(data.msg);
+      callback(data);
     });
 }
 

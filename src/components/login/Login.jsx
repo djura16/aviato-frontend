@@ -6,8 +6,11 @@ import {
     Redirect,
     Link
 } from "react-router-dom";
+import { connect } from "react-redux"
+import { changeUser } from "../../actions/userChangeRedux"
 
 class Login extends Component {
+
     state = {
         redirect: false,
         error: false,
@@ -36,13 +39,14 @@ class Login extends Component {
         this.props.form.validateFields((err, values) => {
             if (!err) {
                 loginUser(values, response => {
-                    if (response !== undefined) {
+                    if (response.msg !== undefined) {
                         this.setState({
                             errorMsg: response,
                             loading: false
                         })
                     }
                     else {
+                        this.props.changeUser(response)
                         window.onbeforeunload = function (e) {
                             logOutUser();
                         };
@@ -62,12 +66,12 @@ class Login extends Component {
             return <Redirect to="/Home/feed"></Redirect>
         }
         return (
-            <Container>
-                <Row className="mt-5">
+            <Container className="no-scroll">
+                <Row>
                     <Col sm={1} md={3}></Col>
                     <Col sm={10} md={6}>
                         {this.state.loading ? <div className="text-center text-primary" style={{ marginTop: "40%" }}><Icon type="loading" style={{ fontSize: "100px" }}></Icon></div> :
-                            <Form onSubmit={this.handleSubmit}>
+                            <Form onSubmit={this.handleSubmit} className="mt-5 form">
                                 <h1>Login</h1>
                                 <Form.Item>
                                     {getFieldDecorator('username', {
@@ -103,11 +107,6 @@ class Login extends Component {
                                     <span className="ml-3">Or </span> <Link to="/Register">register now!</Link>
                                     {this.state.error ? <span className="ml-3 text-danger">{this.state.errorMsg}</span> : ""}
                                 </Form.Item>
-
-                                {/* <Button htmlType="submit">Submit</Button>
-                            <span className="ml-3">Don't have an account? <Link to="/Register"> Register now! </Link></span>
-                            <br />
-                            {this.state.error ? <span className="ml-3 text-danger">{this.state.errorMsg}</span> : ""} */}
                             </Form>}
                     </Col>
                     <Col sm={1} md={3}></Col>
@@ -116,5 +115,10 @@ class Login extends Component {
         );
     }
 }
+
+const mapDispatchToProps = {
+    changeUser,
+}
+
 const LoginForm = Form.create({ name: 'login_form' })(Login);
-export default LoginForm;
+export default connect(null, mapDispatchToProps)(LoginForm);

@@ -55,12 +55,13 @@ class Requests extends Component {
         return (
             user !== null ?
                 <Layout>
-                    <Header id="header" style={{ background: '#fff', padding: 0, marginLeft: onPhone ? "0" : "200px" }}>
+                    <Header id="header" style={{ padding: 0, marginLeft: onPhone ? "0" : "200px" }}>
                         <h1>Follow requests</h1>
                     </Header>
                     <Content id="content" className={onPhone ? "content mx-1" : "content"} style={{ margin: '24px 20% 0', marginLeft: "30%" }}>
-                        <div style={{ padding: 24, background: '#fff', minHeight: window.innerHeight - 158 }}>
+                        <div className="my-5" style={{ padding: 24, minHeight: window.innerHeight - 158 }}>
                             <List
+                                className="requests"
                                 dataSource={requests}
                                 renderItem={item =>
                                     <List.Item>

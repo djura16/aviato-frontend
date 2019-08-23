@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Layout, Avatar, Input, Button, Select, Icon } from 'antd';
+import { Layout, Avatar, Input, Button, Select, Row, Col, Icon } from 'antd';
 import Post from "../Posts/Post";
 import { Link } from "react-router-dom";
 
@@ -41,11 +41,9 @@ class HomeContent extends Component {
     }
 
     searchUser = (value) => {
-
         this.setState({
             searchInput: value
         })
-
     }
 
     handleText = (input) => {
@@ -85,50 +83,45 @@ class HomeContent extends Component {
         const posts = this.props.posts;
 
         return <Layout>
-            <Header id="header" style={{ background: '#fff', padding: 0, marginLeft: onPhone ? "0" : "200px" }}>
-                <h1 style={{ display: "inline-block" }}>Home</h1>
-                <div style={{ width: 300, display: "inline-block", float: "right", marginRight: "25%" }}>
-                    {/* <Search
-                        name="search"
-                        placeholder="Search users"
-                        onChange={value => console.log(value.target.value)}
-                        
-                    /> */}
-                    {/* URADIRI PLACEHOLDER OVDE */}
-                    <Select
-                        showSearch
-                        value={this.state.searchInput}
-                        placeholder="Search users"
-                        style={{ width: "300px" }}
-                        defaultActiveFirstOption={false}
-                        showArrow={false}
-                        filterOption={false}
-                        onSearch={this.handleSearch}
-                        onChange={this.searchUser}
-                        notFoundContent={null}
-                    >
-                        {this.state.searchUser.map((item, i) =>
-                            <Option key={i} >
-                                <Link to={`/Home/user/${item.username}`}>
-                                    <Avatar className="home-feed-avatar" size={40} icon="user" src={item.image} />
-                                    <span className="home-feed-avatar ml-3">
-                                        <h5 className="text-primary">{item.name}</h5>
-                                        <p
-                                            style={{
-                                                marginTop: -14,
-                                                // marginLeft: -40,
-                                                color: "#9c9a9a",
-                                                float: "left"
-                                            }}
-                                        >{"@" + item.username}</p>
-                                    </span>
-                                </Link>
-                            </Option>
-                        )}
-                    </Select>
-                </div>
+            <Header id="header" style={{ color: "white", marginLeft: onPhone ? "0" : "200px", marginTop: onPhone ? "64px" : "inherit" }}>
+                <Row>
+                    <Col md={12} xs={24}>
+                        <h1 style={{ display: "inline-block" }}>Home</h1>
+                    </Col>
+                    <Col md={12} xs={24}>
+                        <Select
+                            placeholder={<span><Icon type="search" className="mx-2" />Search users</span>}
+                            showSearch
+                            style={{ width: "80%" }}
+                            defaultActiveFirstOption={false}
+                            showArrow={false}
+                            filterOption={false}
+                            onSearch={this.handleSearch}
+                            onChange={this.searchUser}
+                        >
+                            {this.state.searchUser.map((item, i) =>
+                                <Option key={i} >
+                                    <Link to={`/Home/user/${item.username}`}>
+                                        <Avatar className="home-feed-avatar" size={40} icon="user" src={item.image} />
+                                        <span className="home-feed-avatar ml-3" style={{ marginBottom: -14 }}>
+                                            <h5 className="text-primary">{item.name}</h5>
+                                            <p
+                                                style={{
+                                                    marginTop: -14,
+                                                    // marginLeft: -40,
+                                                    color: "#9c9a9a",
+                                                    float: "left"
+                                                }}
+                                            >{"@" + item.username}</p>
+                                        </span>
+                                    </Link>
+                                </Option>
+                            )}
+                        </Select>
+                    </Col>
+                </Row>
             </Header>
-            <Content id="content-post" className={onPhone ? "content mx-1" : "content"} style={{ marginLeft: "30%" }}>
+            <Content id="content-post" className={onPhone ? "content mx-1 content-post" : "content content-post"} style={{ marginLeft: "30%", marginTop: onPhone ? "20px" : "inherit" }}>
                 <div className="text-center home-post">
                     <div>
                         <Avatar className="home-feed-avatar" size={80} icon="user" src={user !== null ? user.image : ""} />
@@ -147,7 +140,7 @@ class HomeContent extends Component {
                     </div>
                     <div className="home-post-button">
                         <Button className="px-4" onClick={this.post} style={{ float: "right" }} type="primary">Post</Button>
-                        <span className={this.state.text.length === 150 ? "mr-3 text-danger" : "mr-3"} style={{ float: "right", marginTop: "7px" }}>{this.state.text.length}</span>
+                        <span className={this.state.text.length === 150 ? "text-danger" : ""} style={{ float: "right", marginTop: "-25px", marginRight: "80px" }}>{this.state.text.length}</span>
                     </div>
                 </div>
             </Content>

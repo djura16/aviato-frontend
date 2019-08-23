@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Avatar, Button, Modal, List, Icon } from 'antd';
+import { Avatar, Button, Modal, List } from 'antd';
 import { Link } from "react-router-dom";
 
 class ProfileFollowers extends Component {
+
     state = {
         users: []
     }
